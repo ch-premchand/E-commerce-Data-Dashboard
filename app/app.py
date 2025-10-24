@@ -30,7 +30,7 @@ app.add_page(
     products_page,
     route="/products",
     title="Products Explorer",
-    on_load=[DashboardState.load_data, ProductState.on_load],
+    on_load=ProductState.on_load,
 )
 from app.states.category_state import CategoryState
 

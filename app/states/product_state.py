@@ -30,6 +30,8 @@ class ProductState(rx.State):
     @rx.event
     async def on_load(self):
         dashboard_state = await self.get_state(DashboardState)
+        if not dashboard_state.products:
+            pass
         self.products = dashboard_state.products
         if self.products:
             max_price = max((p["numeric_price"] for p in self.products), default=500)
@@ -152,7 +154,7 @@ class ProductState(rx.State):
         self.current_page = 1
 
     @rx.event
-    def toggle_discount_filter(self, checked: bool):
+    def set_show_discounts_only(self, checked: bool):
         self.show_discounts_only = checked
         self.current_page = 1
 

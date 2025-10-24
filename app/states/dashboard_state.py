@@ -29,17 +29,20 @@ class DashboardState(rx.State):
 
     @rx.event(background=True)
     async def load_data(self):
-        if self.products:
-            async with self:
-                self.is_loading = False
-            return
         async with self:
+            if self.products:
+                logging.info(f"Data already loaded: {len(self.products)} products.")
+                self.is_loading = False
+                return
             self.is_loading = True
+            logging.info("Starting data load...")
         try:
+            logging.info("Downloading dataset from Kagglehub...")
             path = kagglehub.dataset_download("oleksiimartusiuk/e-commerce-data-shein")
-            all_products = []
             files = [f for f in os.listdir(path) if f.endswith(".csv")]
-            for file in files:
+            logging.info(f"Found {len(files)} CSV files to process.")
+            all_products = []
+            for i, file in enumerate(files, 1):
                 try:
                     category_name = (
                         file.replace("us-shein-", "")
@@ -105,11 +108,10 @@ class DashboardState(rx.State):
                                 )
                                 discount_value = 0.0
                         color_count_raw = row.get("color-count")
-                        color_count_raw = row.get("color-count")
                         color_count = (
                             int(color_count_raw)
                             if pd.notna(color_count_raw)
-                            and (not pd.isna(color_count_raw))
+                            and str(color_count_raw).isdigit()
                             else 0
                         )
                         all_products.append(
@@ -130,18 +132,30 @@ class DashboardState(rx.State):
                                 else None,
                             }
                         )
+                    if i % 5 == 0 or i == len(files):
+                        logging.info(
+                            f"Processed {i}/{len(files)} files ({len(all_products)} products so far)."
+                        )
                 except Exception as e:
-                    logging.exception(f"Error processing file {file}: {e}")
+                    logging.exception(f"Skipped file {file}: {e}")
             async with self:
                 self.products = all_products
+                logging.info(f"Data loaded successfully: {len(all_products)} products.")
+                if all_products:
+                    max_price = max(
+                        (p["numeric_price"] for p in all_products), default=0
+                    )
+                    self.price_range = [0, max_price]
         except Exception as e:
-            logging.exception(f"Failed to download or process dataset: {e}")
+            logging.exception(f"Failed to load data: {e}")
+            async with self:
+                self.products = []
         finally:
             async with self:
                 self.is_loading = False
-                if self.products:
-                    max_price = max((p["numeric_price"] for p in self.products))
-                    self.price_range = [0, max_price]
+                logging.info(
+                    f"Loading complete. is_loading = {self.is_loading}, products = {len(self.products)}."
+                )
 
     @rx.var
     def total_products(self) -> int:
@@ -304,11 +318,8 @@ class DashboardState(rx.State):
         self.search_query = query
 
     @rx.event
-    def toggle_category(self, category: str):
+    def set_selected_categories_list(self, category: str):
         if not category:
-            self.selected_categories = []
-            return
-        if category in self.selected_categories:
             self.selected_categories = []
         else:
             self.selected_categories = [category]
@@ -318,7 +329,7 @@ class DashboardState(rx.State):
         self.price_range = pr
 
     @rx.event
-    def toggle_discount_filter(self, checked: bool):
+    def set_show_discounts_only(self, checked: bool):
         self.show_discounts_only = checked
 
     @rx.event

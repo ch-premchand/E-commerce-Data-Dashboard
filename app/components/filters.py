@@ -13,8 +13,9 @@ def category_filter() -> rx.Component:
                     lambda category: rx.el.option(category, value=category),
                 ),
                 value=DashboardState.selected_categories.join(","),
-                on_change=DashboardState.toggle_category,
+                on_change=DashboardState.set_selected_categories_list,
                 class_name="w-full pl-3 pr-10 py-2 border rounded-lg text-sm",
+                key=DashboardState.selected_categories.to_string(),
             ),
             class_name="relative w-full",
         ),
@@ -32,7 +33,7 @@ def search_filter() -> rx.Component:
             ),
             rx.el.input(
                 placeholder="Search products...",
-                on_change=DashboardState.set_search_query,
+                on_change=DashboardState.set_search_query.debounce(300),
                 class_name="w-full pl-10 pr-4 py-2 border rounded-lg text-sm",
                 default_value=DashboardState.search_query,
             ),
@@ -52,7 +53,7 @@ def discount_filter() -> rx.Component:
             rx.el.input(
                 type="checkbox",
                 checked=DashboardState.show_discounts_only,
-                on_change=DashboardState.toggle_discount_filter,
+                on_change=DashboardState.set_show_discounts_only,
                 class_name="ml-2 h-4 w-4 rounded border-gray-300 text-emerald-600 focus:ring-emerald-500",
             ),
             class_name="flex items-center",

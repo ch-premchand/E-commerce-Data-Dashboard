@@ -21,9 +21,7 @@ def filter_sidebar() -> rx.Component:
                         lambda category: rx.el.label(
                             rx.el.input(
                                 type="checkbox",
-                                on_change=lambda: ProductState.toggle_category_filter(
-                                    category
-                                ),
+                                on_change=ProductState.toggle_category_filter(category),
                                 checked=ProductState.selected_categories.contains(
                                     category
                                 ),
@@ -51,7 +49,7 @@ def filter_sidebar() -> rx.Component:
                 rx.el.label(
                     rx.el.input(
                         type="checkbox",
-                        on_change=ProductState.toggle_discount_filter,
+                        on_change=ProductState.set_show_discounts_only,
                         checked=ProductState.show_discounts_only,
                         class_name="h-4 w-4 rounded border-gray-300 text-emerald-600 focus:ring-emerald-500",
                     ),

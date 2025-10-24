@@ -4,7 +4,7 @@ from app.states.navigation_state import NavigationState
 
 def nav_item(label: str, icon: str, href: str) -> rx.Component:
     is_active = rx.State.router.page.path == href
-    return rx.el.a(
+    return rx.link(
         rx.icon(
             icon,
             class_name=rx.cond(
@@ -31,7 +31,7 @@ def nav_item(label: str, icon: str, href: str) -> rx.Component:
 def sidebar() -> rx.Component:
     return rx.el.aside(
         rx.el.div(
-            rx.el.a(
+            rx.link(
                 rx.icon("bar-chart-2", class_name="h-6 w-6 text-emerald-600"),
                 rx.el.span("E-Commerce Analytics", class_name="font-semibold ml-2"),
                 href="/",

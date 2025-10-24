@@ -57,7 +57,7 @@ def category_card(category: CategoryHealth) -> rx.Component:
             ),
             class_name="grid grid-cols-2 md:grid-cols-4 gap-3 text-center",
         ),
-        on_click=lambda: CategoryState.select_category(category["name"]),
+        on_click=CategoryState.select_category(category["name"]),
         class_name=rx.cond(
             is_selected,
             "w-full p-4 bg-white rounded-xl border-2 border-emerald-500 shadow-lg text-left transition-all",

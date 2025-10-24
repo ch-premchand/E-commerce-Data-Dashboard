@@ -67,19 +67,17 @@ def product_view_controls() -> rx.Component:
         rx.el.div(
             rx.el.input(
                 placeholder="Search products...",
-                on_change=ProductState.set_search_query.debounce(500),
+                on_change=ProductState.set_search_query.debounce(300),
                 default_value=ProductState.search_query,
                 class_name="w-full md:w-64 pl-4 pr-4 py-2 border rounded-lg text-sm",
             ),
             rx.el.select(
-                [
-                    ("default", "Default Sort"),
-                    ("price_asc", "Price: Low to High"),
-                    ("price_desc", "Price: High to Low"),
-                    ("discount_desc", "Biggest Discount"),
-                    ("name_asc", "Name (A-Z)"),
-                    ("colors_desc", "Most Colors"),
-                ],
+                rx.el.option("Default Sort", value="default"),
+                rx.el.option("Price: Low to High", value="price_asc"),
+                rx.el.option("Price: High to Low", value="price_desc"),
+                rx.el.option("Biggest Discount", value="discount_desc"),
+                rx.el.option("Name (A-Z)", value="name_asc"),
+                rx.el.option("Most Colors", value="colors_desc"),
                 value=ProductState.sort_by,
                 on_change=ProductState.set_sort_by,
                 class_name="w-full md:w-auto pl-3 pr-10 py-2 border rounded-lg text-sm",
@@ -90,7 +88,7 @@ def product_view_controls() -> rx.Component:
             rx.el.p(f"{ProductState.filtered_products.length()} results"),
             rx.el.button(
                 rx.icon("grid-3x3"),
-                on_click=lambda: ProductState.set_view_mode("grid"),
+                on_click=ProductState.set_view_mode("grid"),
                 class_name=rx.cond(
                     ProductState.view_mode == "grid",
                     "p-2 rounded-lg bg-emerald-100 text-emerald-600",
@@ -99,7 +97,7 @@ def product_view_controls() -> rx.Component:
             ),
             rx.el.button(
                 rx.icon("list"),
-                on_click=lambda: ProductState.set_view_mode("list"),
+                on_click=ProductState.set_view_mode("list"),
                 class_name=rx.cond(
                     ProductState.view_mode == "list",
                     "p-2 rounded-lg bg-emerald-100 text-emerald-600",
@@ -117,18 +115,14 @@ def pagination_controls() -> rx.Component:
         rx.el.div(
             rx.el.button(
                 "Previous",
-                on_click=lambda: ProductState.set_current_page(
-                    ProductState.current_page - 1
-                ),
+                on_click=ProductState.set_current_page(ProductState.current_page - 1),
                 disabled=ProductState.current_page <= 1,
                 class_name="px-4 py-2 text-sm font-medium rounded-md border bg-white hover:bg-gray-50 disabled:opacity-50",
             ),
             rx.el.p(f"Page {ProductState.current_page} of {ProductState.total_pages}"),
             rx.el.button(
                 "Next",
-                on_click=lambda: ProductState.set_current_page(
-                    ProductState.current_page + 1
-                ),
+                on_click=ProductState.set_current_page(ProductState.current_page + 1),
                 disabled=ProductState.current_page >= ProductState.total_pages,
                 class_name="px-4 py-2 text-sm font-medium rounded-md border bg-white hover:bg-gray-50 disabled:opacity-50",
             ),

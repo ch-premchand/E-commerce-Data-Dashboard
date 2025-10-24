@@ -28,6 +28,8 @@ class CategoryState(rx.State):
     @rx.event
     async def on_load(self):
         dashboard_state = await self.get_state(DashboardState)
+        if not dashboard_state.products:
+            pass
         self.products = dashboard_state.products
 
     @rx.var
