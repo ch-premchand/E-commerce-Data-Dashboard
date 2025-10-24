@@ -30,13 +30,7 @@ class AnalysisState(rx.State):
             if not api_key:
                 logging.error("GOOGLE_API_KEY not found.")
                 raise ValueError("API key is missing.")
-            genai.configure(api_key=api_key)
-            model = genai.GenerativeModel(
-                "gemini-1.5-flash",
-                generation_config=genai.types.GenerationConfig(
-                    response_mime_type="application/json"
-                ),
-            )
+            client = genai.Client(api_key=api_key)
             async with self:
                 dashboard_state = await self.get_state(DashboardState)
                 kpis = {
@@ -50,8 +44,17 @@ class AnalysisState(rx.State):
                 category_stats = dashboard_state.category_stats[:5]
                 top_products = dashboard_state.top_10_expensive_products[:5]
             prompt = f'You are a professional e-commerce data analyst. Your task is to provide a concise, insightful analysis of the provided dashboard data. \n            The user has applied some filters, and this is the resulting dataset. Analyze the KPIs, category performance, and top products to identify key insights. \n            \n            **Dashboard Data Summary:**\n            - **Key Performance Indicators (KPIs):** {json.dumps(kpis, indent=2)}\n            - **Top 5 Category Statistics:** {json.dumps(category_stats, indent=2)}\n            - **Top 5 Most Expensive Products:** {json.dumps(top_products, indent=2)}\n\n            **Your Analysis (Strictly follow this JSON format and use Markdown for formatting within strings):**\n            {{\n                "trends": "Identify 1-2 key trends from the data. What patterns are emerging?",\n                "recommendations": "Provide 1-2 actionable business recommendations based on your analysis.",\n                "anomalies": "Point out any surprising or unusual data points that might require further investigation.",\n                "opportunities": "Highlight 1-2 potential opportunities for business growth or optimization."\n            }}\n            '
-            response = await model.generate_content_async(prompt)
-            analysis_data = json.loads(response.text)
+            response = await client.models.generate_content_async(
+                model="gemini-2.0-flash",
+                contents=prompt,
+                config={"response_mime_type": "application/json"},
+            )
+            analysis_data_raw = json.loads(response.text)
+            analysis_data = (
+                analysis_data_raw[0]
+                if isinstance(analysis_data_raw, list)
+                else analysis_data_raw
+            )
             async with self:
                 self.analysis_content = analysis_data
         except Exception as e:

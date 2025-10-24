@@ -1,4 +1,5 @@
 import reflex as rx
+from app.states.dashboard_state import DashboardState
 
 
 def kpi_card(
@@ -29,8 +30,6 @@ def kpi_card(
 
 
 def kpi_grid() -> rx.Component:
-    from app.states.dashboard_state import DashboardState
-
     return rx.el.div(
         kpi_card(
             "Total Products",

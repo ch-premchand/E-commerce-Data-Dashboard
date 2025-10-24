@@ -22,7 +22,6 @@ class Product(TypedDict):
 class DashboardState(rx.State):
     products: list[Product] = []
     is_loading: bool = True
-    active_nav: str = "Dashboard"
     search_query: str = ""
     selected_categories: list[str] = []
     price_range: list[float] = [0, 500]
@@ -201,10 +200,6 @@ class DashboardState(rx.State):
             / len(products_with_colors),
             1,
         )
-
-    @rx.event
-    def set_active_nav(self, nav_item: str):
-        self.active_nav = nav_item
 
     @rx.var
     def category_stats(self) -> list[dict[str, str | int | float]]:

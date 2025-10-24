@@ -1,65 +1,11 @@
 import reflex as rx
 from app.states.dashboard_state import DashboardState
-from app.components.sidebar import sidebar
-from app.components.kpi import kpi_grid, loading_skeleton
-from app.components.charts import (
-    charts_grid,
-    top_products_table,
-    charts_loading_skeleton,
-)
-from app.components.filters import filters_section
-from app.components.analysis_panel import analysis_panel
-
-
-def dashboard_header() -> rx.Component:
-    return rx.el.header(
-        rx.el.h1(
-            "E-Commerce Analytics Dashboard",
-            class_name="text-2xl font-bold tracking-tight text-gray-800",
-        ),
-        class_name="flex items-center h-16 border-b px-6 shrink-0 bg-white",
-    )
-
-
-def index() -> rx.Component:
-    return rx.el.div(
-        sidebar(),
-        rx.el.div(
-            dashboard_header(),
-            rx.el.main(
-                rx.el.div(
-                    filters_section(),
-                    rx.el.div(
-                        rx.el.div(
-                            rx.cond(
-                                DashboardState.is_loading,
-                                loading_skeleton(),
-                                kpi_grid(),
-                            ),
-                            rx.cond(
-                                DashboardState.is_loading,
-                                charts_loading_skeleton(),
-                                rx.el.div(
-                                    charts_grid(),
-                                    top_products_table(),
-                                    class_name="space-y-6",
-                                ),
-                            ),
-                            class_name="space-y-6 flex-1",
-                        ),
-                        analysis_panel(),
-                        class_name="grid lg:grid-cols-3 gap-6 items-start",
-                    ),
-                    class_name="space-y-6",
-                ),
-                class_name="flex-1 p-6 bg-gray-50/50",
-            ),
-            class_name="flex flex-col flex-1",
-        ),
-        on_mount=DashboardState.load_data,
-        class_name="flex min-h-screen w-full font-['Montserrat'] bg-white",
-    )
-
+from app.states.navigation_state import NavigationState
+from app.pages.dashboard import dashboard_page
+from app.pages.products import products_page
+from app.pages.categories import categories_page
+from app.pages.ai_hub import ai_hub_page
+from app.pages.reports import reports_page
 
 app = rx.App(
     theme=rx.theme(appearance="light"),
@@ -72,4 +18,31 @@ app = rx.App(
         ),
     ],
 )
-app.add_page(index)
+app.add_page(
+    dashboard_page,
+    route="/",
+    on_load=DashboardState.load_data,
+    title="Dashboard Overview",
+)
+from app.states.product_state import ProductState
+
+app.add_page(
+    products_page,
+    route="/products",
+    title="Products Explorer",
+    on_load=[DashboardState.load_data, ProductState.on_load],
+)
+from app.states.category_state import CategoryState
+
+app.add_page(
+    categories_page,
+    route="/categories",
+    title="Category Analytics",
+    on_load=[DashboardState.load_data, CategoryState.on_load],
+)
+app.add_page(
+    ai_hub_page, route="/ai-hub", title="AI Hub", on_load=DashboardState.load_data
+)
+app.add_page(
+    reports_page, route="/reports", title="Reports", on_load=DashboardState.load_data
+)
