@@ -1,0 +1,6 @@
+
+reflex==0.8.17a1
+google-genai
+kagglehub
+pandas
+plotly
