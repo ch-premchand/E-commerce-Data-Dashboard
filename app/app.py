@@ -8,6 +8,7 @@ from app.components.charts import (
     charts_loading_skeleton,
 )
 from app.components.filters import filters_section
+from app.components.analysis_panel import analysis_panel
 
 
 def dashboard_header() -> rx.Component:
@@ -28,13 +29,26 @@ def index() -> rx.Component:
             rx.el.main(
                 rx.el.div(
                     filters_section(),
-                    rx.cond(DashboardState.is_loading, loading_skeleton(), kpi_grid()),
-                    rx.cond(
-                        DashboardState.is_loading,
-                        charts_loading_skeleton(),
+                    rx.el.div(
                         rx.el.div(
-                            charts_grid(), top_products_table(), class_name="space-y-6"
+                            rx.cond(
+                                DashboardState.is_loading,
+                                loading_skeleton(),
+                                kpi_grid(),
+                            ),
+                            rx.cond(
+                                DashboardState.is_loading,
+                                charts_loading_skeleton(),
+                                rx.el.div(
+                                    charts_grid(),
+                                    top_products_table(),
+                                    class_name="space-y-6",
+                                ),
+                            ),
+                            class_name="space-y-6 flex-1",
                         ),
+                        analysis_panel(),
+                        class_name="grid lg:grid-cols-3 gap-6 items-start",
                     ),
                     class_name="space-y-6",
                 ),
